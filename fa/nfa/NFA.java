@@ -32,6 +32,7 @@ public class NFA implements NFAInterface {
         // Initializes the start state and adds it to the set of all states.
         if(getState(name) == null){
             startState = new NFAState(name, false);
+            states.add(startState);
         } else {
             startState = getState(name);
         } 
