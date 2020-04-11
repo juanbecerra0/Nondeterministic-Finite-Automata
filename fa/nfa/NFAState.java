@@ -2,6 +2,7 @@ package fa.nfa;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Class that represents a single state in a non-deterministic finite automata.
@@ -24,10 +25,10 @@ public class NFAState extends fa.State {
      * 
      * @param name
      */
-    public NFAState(String name) {
+    public NFAState(String name, boolean flag) {
         this.name = name;
         delta = new HashMap<Character, Set<NFAState>>();
-        isFinal = false;
+        isFinal = flag;
     }
 
     /**
@@ -47,10 +48,18 @@ public class NFAState extends fa.State {
      */
     public void addTransition(char onSymb, NFAState toState) {
         // TODO, we'll need to query the hashset to see if it exists.
-        // If so, add toState state to list of transition states
-        // If not, create set and add the toState
+        // If not, create set 
+        if(delta.get(onSymb) == null){
+            Set<NFAState> states = new HashSet<NFAState>();
+            delta.put(onSymb, states);
+        }
 
-        //delta.put(onSymb, toState);
+        // If so, add toState state to list of transition states
+        Set<NFAState> transitions = delta.get(onSymb);
+        
+        if(!transitions.contains(toState)){
+            transitions.add(toState);
+        }
     }
 
     /**
