@@ -82,6 +82,7 @@ public class NFA implements NFAInterface {
                 return state;
             }
         }
+        return null;
     }
 
     @Override
