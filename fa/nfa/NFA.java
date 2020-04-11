@@ -1,5 +1,6 @@
 package fa.nfa;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import fa.State;
@@ -10,52 +11,97 @@ import fa.dfa.DFA;
  * @author Keegan Saunders
  */
 public class NFA implements NFAInterface {
+
+    // State sets/maps
+    private NFAState startState;
+    private Set<NFAState> states;
+    private Set<NFAState> finalStates;
+    private Set<Character> alphabet;
+    //private Map<StateTransitionPair, NFAState> transitions;   // TODO this will probably need to map to multiple states using eClosure
+
+    // The current state in the DFA simulation. Used in "accepts" and "getToState" methods
+    // private DFAState currentState;   // TODO this will probably need to change too
+
+    /**
+     * Initializes all set variables
+     */
+    public NFA() {
+        states = new LinkedHashSet<NFAState>();
+        finalStates = new LinkedHashSet<NFAState>();
+        alphabet = new LinkedHashSet<Character>();
+        //transitions = new HashMap<StateTransitionPair, NFAState>();
+    }
+
     @Override
     public void addStartState(String name) {
-        // TODO Auto-generated method stub
+        // Initializes the start state and adds it to the set of all states.
+        startState = new NFAState(name);
+        states.add(startState);
 
+        // Also, initialize the start state as the currentState
+        //currentState = startState; // TODO
     }
 
     @Override
     public void addState(String name) {
-        // TODO Auto-generated method stub
+        // Initializes a new state and adds to set of all states.
+        NFAState newState = new NFAState(name);
 
+        // If new state is a duplicate, adding is ignored.
+        states.add(newState);
     }
 
     @Override
     public void addFinalState(String name) {
-        // TODO Auto-generated method stub
+        // Initializes a new state and adds to set of all states and final states.
+        NFAState newState = new NFAState(name);
 
+        // If new state is a duplicate, adding is ignored.
+        states.add(newState);
+        finalStates.add(newState);
     }
 
     @Override
     public void addTransition(String fromState, char onSymb, String toState) {
-        // TODO Auto-generated method stub
+        // Create a "toState" object
+        NFAState newState = new NFAState(toState);
 
+        // Check if the "new state" is within our set of all states. If not, simply return.
+        if(!states.contains(new NFAState(toState)))
+            return;
+
+        // Add symbol to alphabet if it is not already in there
+        alphabet.add(onSymb);
+
+        // Create a "key" values, which is a StateTransitionPair object
+        //StateTransitionPair stp = new StateTransitionPair(fromState, onSymb); // TODO
+
+        // Maps the key to the corresponding state
+        // transitions.put(stp, newState);  // TODO
     }
 
     @Override
     public Set<? extends State> getStates() {
-        // TODO Auto-generated method stub
-        return null;
+        // Returns set of all states
+        return states;
     }
 
     @Override
     public Set<? extends State> getFinalStates() {
-        // TODO Auto-generated method stub
-        return null;
+        // Returns set of all final states
+        return finalStates;
     }
 
     @Override
     public State getStartState() {
-        // TODO Auto-generated method stub
-        return null;
+        // Returns the start state
+        return startState;
     }
 
     @Override
     public Set<Character> getABC() {
-        // TODO Auto-generated method stub
-        return null;
+        // Returns the alphabet set
+        return alphabet;
     }
 
     @Override
