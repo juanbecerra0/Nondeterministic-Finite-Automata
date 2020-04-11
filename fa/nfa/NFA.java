@@ -58,22 +58,10 @@ public class NFA implements NFAInterface {
 
     @Override
     public void addTransition(String fromState, char onSymb, String toState) {
-
         NFAState actualFromState = getState(fromState);
         NFAState actualToState = getState(toState);
 
-        // Check if the "new state" is within our set of all states. If not, simply return.
-        if(!states.contains(new NFAState(toState)))
-            return;
-
-        // Add symbol to alphabet if it is not already in there
-        alphabet.add(onSymb);
-
-        // Create a "key" values, which is a StateTransitionPair object
-        //StateTransitionPair stp = new StateTransitionPair(fromState, onSymb); // TODO
-
-        // Maps the key to the corresponding state
-        // transitions.put(stp, newState);  // TODO
+        actualFromState.addTransition(onSymb, actualToState);
     }
 
     // returns state based on name
@@ -95,6 +83,9 @@ public class NFA implements NFAInterface {
     @Override
     public Set<? extends State> getFinalStates() {
         // Returns set of all final states
+
+        
+
         return finalStates;
     }
 
