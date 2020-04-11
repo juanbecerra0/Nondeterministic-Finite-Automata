@@ -1,6 +1,8 @@
 package fa.nfa;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import fa.State;
@@ -12,85 +14,17 @@ import fa.dfa.DFA;
  */
 public class NFA implements NFAInterface {
 
-    /**
-     * Class used as a key value pair for transition functions
-     */
-    private class StateTransitionPair {
-
-        // The hashcode computed from the state name string and transition char
-        private String state;
-        private char transition;
-        private int hashCode;
-
-        /**
-         * Constructor for StateTransitionPair. Simply creates a hashcode from the 
-         * concatenated state name and a transition.
-         * 
-         * @param s
-         * @param c
-         */
-        public StateTransitionPair(String s, char c) {
-            this.state = s;
-            this.transition = c;
-            this.hashCode = (s + c).hashCode();
-        }
-
-        /**
-         * Returns unique computer hashcode.
-         * 
-         * Used to ensure that the key value of transitions Map is unique.
-         * 
-         * @return hashCode
-         */
-        @Override
-        public int hashCode() {
-            return hashCode;
-        }
-
-        /**
-         * @return the state string
-         */
-        public String getState() {
-            return state;
-        }
-
-        /**
-         * @return the transition char
-         */
-        public char getTransition() {
-            return transition;
-        }
-
-        /**
-         * Returns whether two STP's are equal.
-         * 
-         * Used to ensure that the key value of transitions Map is unique.
-         */
-        @Override
-        public boolean equals(Object object) {
-            StateTransitionPair otherSTP = (StateTransitionPair) object;
-            return this.hashCode() == otherSTP.hashCode();
-        }
-    }
-
     // State sets/maps
     private NFAState startState;
-    private Set<NFAState> states;
-    private Set<NFAState> finalStates;
+    private Map<String, NFAState> states;
     private Set<Character> alphabet;
-    //private Map<StateTransitionPair, NFAState> transitions;   // TODO this will probably need to map to multiple states using eClosure
-
-    // The current state in the DFA simulation. Used in "accepts" and "getToState" methods
-    // private DFAState currentState;   // TODO this will probably need to change too
 
     /**
      * Initializes all set variables
      */
     public NFA() {
-        states = new LinkedHashSet<NFAState>();
-        finalStates = new LinkedHashSet<NFAState>();
+        states = new LinkedHashMap<String, NFAState>();
         alphabet = new LinkedHashSet<Character>();
-        //transitions = new HashMap<StateTransitionPair, NFAState>();
     }
 
     @Override
