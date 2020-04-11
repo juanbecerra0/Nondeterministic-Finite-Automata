@@ -83,8 +83,13 @@ public class NFA implements NFAInterface {
     @Override
     public Set<? extends State> getFinalStates() {
         // Returns set of all final states
+        Set<NFAState> finalStates = new LinkedHashSet<NFAState>();
 
-        
+        for(NFAState state : states){
+            if(state.isFinal(){
+                finalStates.add(state);
+            }
+        }
 
         return finalStates;
     }
