@@ -30,10 +30,10 @@ public class NFA implements NFAInterface {
     @Override
     public void addStartState(String name) {
         // Initializes the start state and adds it to the set of all states.
-        if(states.get(name) == null){
+        if(getState(name) == null){
             startState = new NFAState(name, false);
         } else {
-            startState = states.get(name);
+            startState = getState(name);
         } 
     }
 
