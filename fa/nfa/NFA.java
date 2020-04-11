@@ -16,14 +16,14 @@ public class NFA implements NFAInterface {
 
     // State sets/maps
     private NFAState startState;
-    private Map<String, NFAState> states;
+    private Set<NFAState> states;
     private Set<Character> alphabet;
 
     /**
      * Initializes all set variables
      */
     public NFA() {
-        states = new LinkedHashMap<String, NFAState>();
+        states = new LinkedHashSet<NFAState>();
         alphabet = new LinkedHashSet<Character>();
     }
 
@@ -73,6 +73,10 @@ public class NFA implements NFAInterface {
 
         // Maps the key to the corresponding state
         // transitions.put(stp, newState);  // TODO
+    }
+
+    private DFAState getState(String name) {
+        
     }
 
     @Override
