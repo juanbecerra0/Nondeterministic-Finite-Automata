@@ -75,8 +75,13 @@ public class NFA implements NFAInterface {
         // transitions.put(stp, newState);  // TODO
     }
 
-    private DFAState getState(String name) {
-        
+    // returns state based on name
+    private NFAState getState(String name) {
+        for(NFAState state : states){
+            if(state.getName() == name){
+                return state;
+            }
+        }
     }
 
     @Override
