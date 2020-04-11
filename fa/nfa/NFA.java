@@ -58,9 +58,14 @@ public class NFA implements NFAInterface {
 
     @Override
     public void addTransition(String fromState, char onSymb, String toState) {
+        // Find the actual from and to state in our set
         NFAState actualFromState = getState(fromState);
         NFAState actualToState = getState(toState);
 
+        // Add alphabet symbol
+        alphabet.add(onSymb);
+
+        // Add transition to fromState
         actualFromState.addTransition(onSymb, actualToState);
     }
 
@@ -82,15 +87,17 @@ public class NFA implements NFAInterface {
 
     @Override
     public Set<? extends State> getFinalStates() {
-        // Returns set of all final states
+        // Create set of final states
         Set<NFAState> finalStates = new LinkedHashSet<NFAState>();
 
+        // Look through set of all states, adding only final states
         for(NFAState state : states){
-            if(state.isFinal(){
+            if(state.isFinal()){
                 finalStates.add(state);
             }
         }
 
+        // Return created set
         return finalStates;
     }
 
