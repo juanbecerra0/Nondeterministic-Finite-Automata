@@ -41,7 +41,7 @@ public class NFA implements NFAInterface {
     @Override
     public void addState(String name) {
         // Initializes a new state and adds to set of all states.
-        NFAState newState = new NFAState(name);
+        NFAState newState = new NFAState(name, false);
 
         // If new state is a duplicate, adding is ignored.
         states.add(newState);
@@ -54,13 +54,13 @@ public class NFA implements NFAInterface {
 
         // If new state is a duplicate, adding is ignored.
         states.add(newState);
-        finalStates.add(newState);
     }
 
     @Override
     public void addTransition(String fromState, char onSymb, String toState) {
-        // Create a "toState" object
-        NFAState newState = new NFAState(toState);
+
+        NFAState actualFromState = getState(fromState);
+        NFAState actualToState = getState(toState);
 
         // Check if the "new state" is within our set of all states. If not, simply return.
         if(!states.contains(new NFAState(toState)))
