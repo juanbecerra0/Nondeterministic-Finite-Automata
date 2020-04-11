@@ -30,11 +30,11 @@ public class NFA implements NFAInterface {
     @Override
     public void addStartState(String name) {
         // Initializes the start state and adds it to the set of all states.
-        startState = new NFAState(name);
-        states.add(startState);
-
-        // Also, initialize the start state as the currentState
-        //currentState = startState; // TODO
+        if(states.get(name) == null){
+            startState = new NFAState(name, false);
+        } else {
+            startState = states.get(name);
+        } 
     }
 
     @Override
@@ -49,7 +49,7 @@ public class NFA implements NFAInterface {
     @Override
     public void addFinalState(String name) {
         // Initializes a new state and adds to set of all states and final states.
-        NFAState newState = new NFAState(name);
+        NFAState newState = new NFAState(name, true);
 
         // If new state is a duplicate, adding is ignored.
         states.add(newState);
