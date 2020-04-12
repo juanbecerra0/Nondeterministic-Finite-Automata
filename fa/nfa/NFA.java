@@ -134,8 +134,8 @@ public class NFA implements NFAInterface {
         queue.add(startNFAState);
 
         // In addition, keep a set of these states saved to avoid duplicates
-        Set<Set<NFAState>> dfaStates = new HashSet<Set<NFAState>>();
-        dfaStates.add(startNFAState);
+        Set<String> dfaStates = new HashSet<String>();
+        dfaStates.add(startNFAState.toString());
 
         // Iteratively perform BFS on the branching paths of this startNFA while creating 
         // new states and transitions for the DFA
@@ -145,6 +145,10 @@ public class NFA implements NFAInterface {
 
             // Iterate through all alphabet symbols
             for (Character symb: alphabet) {
+                // Ignore empty transitions, handled by getToState()
+                if(symb.equals('e'))
+                    continue;
+
                 // Create a new possible state, and keep a flag to see if it would be final
                 Set<NFAState> toNFAState = new HashSet<NFAState>();
                 Boolean isFinal = false;
@@ -160,20 +164,22 @@ public class NFA implements NFAInterface {
                     }
                 }
 
-                // If toState is empty, then this symbol would go to the error state
-                if (toNFAState.isEmpty()) {
-                    if(!dfaStates.contains(toNFAState))
-                        dfa.addState("[]");
-                    dfa.addTransition(fromNFAState.toString(), symb, "[]");
+                // Is this a new state? If so, add to library and enqueue
+                if(!dfaStates.contains(toNFAState.toString())) {
+                    dfaStates.add(toNFAState.toString());
+                    queue.add(toNFAState);
+
+                    if (isFinal) {
+                        dfa.addFinalState(toNFAState.toString());
+                    } else {
+                        dfa.addState(toNFAState.toString());
+                    }
                 }
-                // Otherwise, if final, add this as a final state
-                else if (isFinal) {
-                    if(!dfaStates.contains(toNFAState))
-                        dfa.addFinalState(fromNFAState.toString());
+
+                // Add the transition
+                if (isFinal) {
                     dfa.addTransition(fromNFAState.toString(), symb, toNFAState.toString());
                 } else {
-                    if(!dfaStates.contains(toNFAState))
-                        dfa.addState(fromNFAState.toString());
                     dfa.addTransition(fromNFAState.toString(), symb, toNFAState.toString());
                 }
             }
