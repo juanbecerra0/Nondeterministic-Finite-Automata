@@ -65,7 +65,7 @@ public class NFAState extends fa.State {
      * Returns set of states of where this state can go given a symbol
      * 
      * @param symb
-     * @return set of states if valid, error if cannot make transition
+     * @return set of states, which can be empty
      */
     public Set<NFAState> getTo(char symb) {
         Set<NFAState> ret = delta.get(symb);

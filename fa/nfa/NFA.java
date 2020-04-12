@@ -9,6 +9,8 @@ import fa.State;
 import fa.dfa.DFA;
 
 /**
+ * NFA model that can be turned into a DFA
+ * 
  * @author Juan Becerra
  * @author Keegan Saunders
  */
@@ -145,7 +147,7 @@ public class NFA implements NFAInterface {
 
             // Iterate through all alphabet symbols
             for (Character symb: alphabet) {
-                // Ignore empty transitions, handled by getToState()
+                // Ignore empty transitions, since they're handled by getToState()/eClosure()
                 if(symb.equals('e'))
                     continue;
 
@@ -169,6 +171,7 @@ public class NFA implements NFAInterface {
                     dfaStates.add(toNFAState.toString());
                     queue.add(toNFAState);
 
+                    // Add regular state or final state?
                     if (isFinal) {
                         dfa.addFinalState(toNFAState.toString());
                     } else {
@@ -177,11 +180,7 @@ public class NFA implements NFAInterface {
                 }
 
                 // Add the transition
-                if (isFinal) {
-                    dfa.addTransition(fromNFAState.toString(), symb, toNFAState.toString());
-                } else {
-                    dfa.addTransition(fromNFAState.toString(), symb, toNFAState.toString());
-                }
+                dfa.addTransition(fromNFAState.toString(), symb, toNFAState.toString());
             }
         }
 
@@ -219,12 +218,15 @@ public class NFA implements NFAInterface {
     }
 
     private Set<NFAState> eClosureRecursiveSearch(Set<NFAState> eClosure, NFAState s) {
+        // Get all empty transitions from the evaluated state
         for (NFAState transitionState : s.getTo('e')) {
+            // If there is an unexplored state, recursively explore it
             if (!eClosure.contains(transitionState)) {
                 eClosure.add(transitionState);
                 eClosure = eClosureRecursiveSearch(eClosure, transitionState);
             }
         }
+        // Return the running solution
         return eClosure;
     }
 
