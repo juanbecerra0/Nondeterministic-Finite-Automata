@@ -121,8 +121,8 @@ public class NFA implements NFAInterface {
 
     @Override
     public Set<NFAState> getToState(NFAState from, char onSymb) {
-        // TODO Auto-generated method stub
-        return null;
+        // Calls the same function within NFAState
+        return from.getTo(onSymb);
     }
 
     @Override

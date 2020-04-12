@@ -47,7 +47,6 @@ public class NFAState extends fa.State {
      * @param toState
      */
     public void addTransition(char onSymb, NFAState toState) {
-        // TODO, we'll need to query the hashset to see if it exists.
         // If not, create set 
         if(delta.get(onSymb) == null){
             Set<NFAState> states = new HashSet<NFAState>();
