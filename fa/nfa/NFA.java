@@ -72,7 +72,7 @@ public class NFA implements NFAInterface {
     // returns state based on name
     private NFAState getState(String name) {
         for(NFAState state : states){
-            if(state.getName() == name){
+            if(state.getName().equals(name)){
                 return state;
             }
         }
@@ -127,10 +127,22 @@ public class NFA implements NFAInterface {
 
     @Override
     public Set<NFAState> eClosure(NFAState s) {
-        // TODO Auto-generated method stub
-        return null;
+        // Create a new set with this current state
+        Set<NFAState> eClosure = new LinkedHashSet<NFAState>();
+        eClosure.add(s);
+
+        // Perform initial recursive call on this state
+        return eClosureRecursiveSearch(eClosure, s);
     }
 
-    
+    private Set<NFAState> eClosureRecursiveSearch(Set<NFAState> eClosure, NFAState s) {
+        for (NFAState transitionState : getToState(s, 'e')) {
+            if (!eClosure.contains(transitionState)) {
+                eClosure.add(transitionState);
+                eClosure = eClosureRecursiveSearch(eClosure, transitionState);
+            }
+        }
+        return eClosure;
+    }
 
 }
