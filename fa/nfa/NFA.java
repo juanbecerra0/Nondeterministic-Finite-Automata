@@ -1,9 +1,9 @@
 package fa.nfa;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import fa.State;
 import fa.dfa.DFA;
@@ -23,8 +23,8 @@ public class NFA implements NFAInterface {
      * Initializes all set variables
      */
     public NFA() {
-        states = new LinkedHashSet<NFAState>();
-        alphabet = new LinkedHashSet<Character>();
+        states = new HashSet<NFAState>();
+        alphabet = new HashSet<Character>();
     }
 
     @Override
@@ -88,7 +88,7 @@ public class NFA implements NFAInterface {
     @Override
     public Set<? extends State> getFinalStates() {
         // Create set of final states
-        Set<NFAState> finalStates = new LinkedHashSet<NFAState>();
+        Set<NFAState> finalStates = new HashSet<NFAState>();
 
         // Look through set of all states, adding only final states
         for(NFAState state : states){
@@ -115,20 +115,103 @@ public class NFA implements NFAInterface {
 
     @Override
     public DFA getDFA() {
-        // TODO Auto-generated method stub
-        return null;
+        // DFA to return
+        DFA dfa = new DFA();
+
+        // Create the start state, set it to be the start of the NFA, and determine 
+        // if it is final
+        Set<NFAState> startNFAState = eClosure(startState);
+        for (NFAState state : startNFAState) {
+            if (state.isFinal()) {
+                dfa.addFinalState(startNFAState.toString());
+                break;
+            }
+        }
+        dfa.addStartState(startNFAState.toString());
+
+        // Create a queue to explore new DFA states, and add start state to it
+        Queue<Set<NFAState>> queue = new LinkedBlockingQueue<Set<NFAState>>();
+        queue.add(startNFAState);
+
+        // In addition, keep a set of these states saved to avoid duplicates
+        Set<String> dfaStates = new HashSet<String>();
+        dfaStates.add(startNFAState.toString());
+
+        // Iteratively perform BFS on the branching paths of this startNFA while creating 
+        // new states and transitions for the DFA
+        while(!queue.isEmpty()) {
+            // Dequeue a state
+            Set<NFAState> fromNFAState = queue.remove();
+
+            // Iterate through all alphabet symbols
+            for (Character symb: alphabet) {
+                // Ignore empty transitions, handled by getToState()
+                if(symb.equals('e'))
+                    continue;
+
+                // Create a new possible state, and keep a flag to see if it would be final
+                Set<NFAState> toNFAState = new HashSet<NFAState>();
+                Boolean isFinal = false;
+                // Iterate through the states within this DFA state
+				for (NFAState state : fromNFAState) {
+                    // For this set of states, find all the possible transitions given this alphabet symbol
+                    Set<NFAState> transitions = getToState(state, symb);
+                    for (NFAState t : transitions) {
+                        toNFAState.add(t);
+                        // Flag if this transition-to state is final
+                        if (t.isFinal())
+                            isFinal = true;
+                    }
+                }
+
+                // Is this a new state? If so, add to library and enqueue
+                if(!dfaStates.contains(toNFAState.toString())) {
+                    dfaStates.add(toNFAState.toString());
+                    queue.add(toNFAState);
+
+                    if (isFinal) {
+                        dfa.addFinalState(toNFAState.toString());
+                    } else {
+                        dfa.addState(toNFAState.toString());
+                    }
+                }
+
+                // Add the transition
+                if (isFinal) {
+                    dfa.addTransition(fromNFAState.toString(), symb, toNFAState.toString());
+                } else {
+                    dfa.addTransition(fromNFAState.toString(), symb, toNFAState.toString());
+                }
+            }
+        }
+
+        return dfa;
     }
 
     @Override
     public Set<NFAState> getToState(NFAState from, char onSymb) {
-        // Calls the same function within NFAState
-        return from.getTo(onSymb);
+        // Keep track of a set to return
+        Set<NFAState> ret = new HashSet<NFAState>();
+
+        // Get eClosure of from
+        for (NFAState closureState : eClosure(from)) {
+            // Apply the transition
+            for(NFAState transState : closureState.getTo(onSymb)) {
+                // For each of the eClosures of the transitions, add to ret
+                for(NFAState transClosureState : eClosure(transState)) {
+                    ret.add(transClosureState);
+                }
+            }
+        }
+
+        // Return the set
+        return ret;
     }
 
     @Override
     public Set<NFAState> eClosure(NFAState s) {
         // Create a new set with this current state
-        Set<NFAState> eClosure = new LinkedHashSet<NFAState>();
+        Set<NFAState> eClosure = new HashSet<NFAState>();
         eClosure.add(s);
 
         // Perform initial recursive call on this state
@@ -136,7 +219,7 @@ public class NFA implements NFAInterface {
     }
 
     private Set<NFAState> eClosureRecursiveSearch(Set<NFAState> eClosure, NFAState s) {
-        for (NFAState transitionState : getToState(s, 'e')) {
+        for (NFAState transitionState : s.getTo('e')) {
             if (!eClosure.contains(transitionState)) {
                 eClosure.add(transitionState);
                 eClosure = eClosureRecursiveSearch(eClosure, transitionState);
