@@ -2,6 +2,7 @@ package fa.nfa;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -117,11 +118,10 @@ public class NFA implements NFAInterface {
 
     @Override
     public DFA getDFA() {
-        Set<Set<NFAState>> dfaStates = new LinkedHashSet<Set<NFAState>>();
+    
+        Set<Set<NFAState>> dfaStates = new HashSet<Set<NFAState>>();
         NFAState nullState = new NFAState("[]", false);
-
         DFA dfa = new DFA();
-        dfa.addState("[]");
 
         //start state
         Set<NFAState> start = eClosure(this.startState);
@@ -134,17 +134,23 @@ public class NFA implements NFAInterface {
         dfaStates.add(start);
         dfa.addStartState(start.toString());
 
+
         for(NFAState state : this.states){
             for(Character c : this.alphabet){
-                Set<NFAState> curr = state.getTo(c);
+                Set<NFAState> curr = getToState(state, c);
                 if (curr != null) {
+                    System.out.println("zabeep" + curr.toString());
                     for(NFAState s : curr){
                         if(s != null && s.isFinal()){
                             dfa.addFinalState(curr.toString());
                             break;
                         }
                     }
+                    System.out.println("beep" + curr.toString());
                     dfa.addState(curr.toString());
+                } else {
+                    System.out.println("null transition found");
+                    dfa.addState("[]");
                 }
             }
         }
@@ -153,7 +159,7 @@ public class NFA implements NFAInterface {
             for(Character c : this.alphabet){
                 Set<NFAState> transition = new LinkedHashSet<>();
                 for(NFAState s : dfaState){
-                    for(NFAState t : s.getTo(c)){
+                    for(NFAState t : getToState(s, c)){
                         if(t == null){
                             t = nullState;
                         }
@@ -163,19 +169,33 @@ public class NFA implements NFAInterface {
                 dfa.addTransition(dfaState.toString(), c, transition.toString());
             }
         }
-        return null;
+        return dfa;
     }
 
     @Override
     public Set<NFAState> getToState(NFAState from, char onSymb) {
-        // Calls the same function within NFAState
-        return from.getTo(onSymb);
+        // Keep track of a set to return
+        Set<NFAState> ret = new HashSet<NFAState>();
+
+        // Get eClosure of from
+        for (NFAState closureState : eClosure(from)) {
+            // Apply the transition
+            for(NFAState transState : closureState.getTo(onSymb)) {
+                // For each of the eClosures of the transitions, add to ret
+                for(NFAState transClosureState : eClosure(transState)) {
+                    ret.add(transClosureState);
+                }
+            }
+        }
+
+        // Return the set
+        return ret;
     }
 
     @Override
     public Set<NFAState> eClosure(NFAState s) {
         // Create a new set with this current state
-        Set<NFAState> eClosure = new LinkedHashSet<NFAState>();
+        Set<NFAState> eClosure = new HashSet<NFAState>();
         eClosure.add(s);
 
         // Perform initial recursive call on this state
@@ -183,7 +203,7 @@ public class NFA implements NFAInterface {
     }
 
     private Set<NFAState> eClosureRecursiveSearch(Set<NFAState> eClosure, NFAState s) {
-        for (NFAState transitionState : getToState(s, 'e')) {
+        for (NFAState transitionState : s.getTo('e')) {
             if (!eClosure.contains(transitionState)) {
                 eClosure.add(transitionState);
                 eClosure = eClosureRecursiveSearch(eClosure, transitionState);

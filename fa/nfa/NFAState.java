@@ -70,8 +70,10 @@ public class NFAState extends fa.State {
     public Set<NFAState> getTo(char symb) {
         Set<NFAState> ret = delta.get(symb);
         if(ret == null){
-            System.err.println("ERROR: DFAState.getTo(char symb) returns null on " + symb + " from " + name);
-            System.exit(2);
+            System.out.println("State " + this.name + " returned null on char " +symb);
+            ret = new HashSet<NFAState>();
+        } else {
+            System.out.println("State " + this.name + " returned "+ ret.toString() + " on " + symb);
         }
         return ret;
     }
