@@ -117,6 +117,8 @@ public class NFA implements NFAInterface {
 
     @Override
     public DFA getDFA() {
+        Set<Set<NFAState>> dfaStates = new LinkedHashSet<Set<NFAState>>();
+        NFAState nullState = new NFAState("[]", false);
 
         DFA dfa = new DFA();
         dfa.addState("[]");
@@ -129,6 +131,7 @@ public class NFA implements NFAInterface {
                 break;
             }
         }
+        dfaStates.add(start);
         dfa.addStartState(start.toString());
 
         for(NFAState state : this.states){
@@ -146,11 +149,20 @@ public class NFA implements NFAInterface {
             }
         }
 
-
-
-
-        
-
+        for(Set<NFAState> dfaState : dfaStates){
+            for(Character c : this.alphabet){
+                Set<NFAState> transition = new LinkedHashSet<>();
+                for(NFAState s : dfaState){
+                    for(NFAState t : s.getTo(c)){
+                        if(t == null){
+                            t = nullState;
+                        }
+                        transition.add(t);
+                    }
+                }
+                dfa.addTransition(dfaState.toString(), c, transition.toString());
+            }
+        }
         return null;
     }
 
