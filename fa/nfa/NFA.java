@@ -179,15 +179,27 @@ public class NFA implements NFAInterface {
             }
         }
 
-        System.out.println(dfa.getStates());
-
         return dfa;
     }
 
     @Override
     public Set<NFAState> getToState(NFAState from, char onSymb) {
-        // Calls the same function within NFAState
-        return from.getTo(onSymb);
+        // Keep track of a set to return
+        Set<NFAState> ret = new HashSet<NFAState>();
+
+        // Get eClosure of from
+        for (NFAState closureState : eClosure(from)) {
+            // Apply the transition
+            for(NFAState transState : closureState.getTo(onSymb)) {
+                // For each of the eClosures of the transitions, add to ret
+                for(NFAState transClosureState : eClosure(transState)) {
+                    ret.add(transClosureState);
+                }
+            }
+        }
+
+        // Return the set
+        return ret;
     }
 
     @Override
@@ -201,10 +213,7 @@ public class NFA implements NFAInterface {
     }
 
     private Set<NFAState> eClosureRecursiveSearch(Set<NFAState> eClosure, NFAState s) {
-        if (getToState(s, 'e').isEmpty())
-            return eClosure;
-
-        for (NFAState transitionState : getToState(s, 'e')) {
+        for (NFAState transitionState : s.getTo('e')) {
             if (!eClosure.contains(transitionState)) {
                 eClosure.add(transitionState);
                 eClosure = eClosureRecursiveSearch(eClosure, transitionState);
