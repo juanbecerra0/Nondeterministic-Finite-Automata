@@ -2,8 +2,10 @@ package fa.nfa;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.Queue;
 
 import fa.State;
 import fa.dfa.DFA;
@@ -115,7 +117,40 @@ public class NFA implements NFAInterface {
 
     @Override
     public DFA getDFA() {
-        // TODO Auto-generated method stub
+
+        DFA dfa = new DFA();
+        dfa.addState("[]");
+
+        //start state
+        Set<NFAState> start = eClosure(this.startState);
+        for(NFAState s : start){
+            if(s.isFinal()){
+                dfa.addFinalState(start.toString());
+                break;
+            }
+        }
+        dfa.addStartState(start.toString());
+
+        for(NFAState state : this.states){
+            for(Character c : this.alphabet){
+                Set<NFAState> curr = state.getTo(c);
+                if (curr != null) {
+                    for(NFAState s : curr){
+                        if(s != null && s.isFinal()){
+                            dfa.addFinalState(curr.toString());
+                            break;
+                        }
+                    }
+                    dfa.addState(curr.toString());
+                }
+            }
+        }
+
+
+
+
+        
+
         return null;
     }
 
