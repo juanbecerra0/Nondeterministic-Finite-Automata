@@ -6,7 +6,7 @@
 
 ## Overview
 
-Nondeterministic Finite Automata builds off of our previous DFA assignment, which allowed a user to create a finite-state machine and test a list of strings on it to see if the machine would accept them. While NFA’s and DFA’s are equivalent in power, it’s often easier to develop a non-deterministic machine and converting it into a deterministic machine for real-world applications. One of the biggest features of this assignment is allowing users to create an NFA that can easily be converted into a DFA with a single method, getDFA(), which in turn calls several other useful functions, like getToState(from, symb) and eClosure(state).
+Nondeterministic Finite Automata builds off of our previous DFA assignment, which allowed a user to create a finite-state machine and test a list of strings on it to see if the machine would accept them. While NFA’s and DFA’s are equivalent in power, it’s often easier to develop a non-deterministic machine and converting it into a deterministic machine for real-world applications. One of the biggest features of this assignment is allowing users to create an NFA that can easily be converted into a DFA with a single method, getDFA(), which in turn calls several other useful functions, like getToState(from, symb) and eClosure(state). <sup><sup>Bette is butt.</sup></sup>
 
 ## Compiling and Using
 
@@ -58,7 +58,13 @@ The getDFA() method returns a DFA equivalent to the current NFA. This was the mo
 
 ## Testing
 
-// TODO
+Prior to getting larger methods like getToState() working, we ran our program in an alternate driver, which tested the functionality of dependent methods, like getToState() and eClosure(). Initially, our getToState() method simply called the NFAState.getTo() method. However, we discovered that this wouldn’t return the results that we’d expect. Our tests revealed that we simply calling getTo() would only return the transitions from directly taking a transition without possible empty transitions. We later fixed the getToState() method by taking the eClosure(), calling getTo(), then calling eClosure() again.
+
+When testing eClosure() we ran into some cases that would give us stack overflows. This was due to our DFS algorithm evaluating empty transitions circularly. For instance, if we wanted to evaluate state “a” with transitions aeb, bec, and cea, the algorithm would essentially keep exploring the path infinitely from a, to b, to c, and back to a. We fixed this by also passing an intermediate state set down the call-stack, which the algorithm would reference to avoid reevaluating states that it has already visited.
+
+When testing our getDFA() implementation, we went through a number of different ideas. At first, we wanted to approach it like we did using tables in class for NFA -> DFA conversions. We’d essentially keep adding to a table of transitions, which would extend whenever new states are discovered. This proved to be a pretty big hassle in design, so we opted for a queue approach that would simply find all transitions for the dequeued state, and would enqueue any new discovered states. In this design, we kept getting empty error states in cases where we shouldn’t have them, such as p2tc0.txt. Print statements revealed that our algorithm was trying to find ‘e’ transitions for all discovered states, which would confuse our algorithm and consequently create many error states. We fixed this by ignoring the ‘e’ character in the NFA’s alphabet, and simply calling getToState() in our algorithm, which in turn handled the eClosure() of all states.
+
+In the end, our implementation matched the output given for all tests, but with unordered states in the NFA (which should be fine according to the assignment). With all cases passing in both the given tests and our own alternate driver, we considered the assignment complete.
 
 ## Extra Credit
 
