@@ -44,6 +44,7 @@ In NFA.java, we also modeled many of our basic methods after what we found in th
 -	getFinalStates()
 -	getStartState()
 -	getABC()
+
 were implemented almost exactly like they were in DFA, as one would expect. We excluded some error checking as they weren’t really needed for this assignment besides debugging during development. The most significant changes made for this assignment were done in getDFA(), getToState(), and eClosure().
 
 ### eClosure()
